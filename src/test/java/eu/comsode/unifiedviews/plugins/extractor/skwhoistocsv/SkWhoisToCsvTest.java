@@ -1,4 +1,4 @@
-package eu.unifiedviews.plugins.transformer.skwhoistocsv;
+package eu.comsode.unifiedviews.plugins.extractor.skwhoistocsv;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -10,12 +10,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import cz.cuni.mff.xrg.odcs.dpu.test.TestEnvironment;
+import eu.comsode.unifiedviews.plugins.extractor.skwhoistocsv.SkWhoisToCsv;
+import eu.comsode.unifiedviews.plugins.extractor.skwhoistocsv.SkWhoisToCsvConfig_V1;
 import eu.unifiedviews.dataunit.files.FilesDataUnit;
 import eu.unifiedviews.dataunit.files.WritableFilesDataUnit;
 import eu.unifiedviews.helpers.dataunit.files.FilesHelper;
 import eu.unifiedviews.helpers.dpu.test.config.ConfigurationBuilder;
-import eu.unifiedviews.plugins.transformer.skwhoistocsv.SkWhoisToCsv;
-import eu.unifiedviews.plugins.transformer.skwhoistocsv.SkWhoisToCsvConfig_V1;
 
 
 public class SkWhoisToCsvTest {

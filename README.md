@@ -1,11 +1,11 @@
-# T-SkWhoisToCsv #
+# E-SkWhoisToCsv #
 ----------
 
 ###General###
 
 |                              |                                                               |
 |------------------------------|---------------------------------------------------------------|
-|**Name:**                     |T-SkWhoisToCsv                                              |
+|**Name:**                     |E-SkWhoisToCsv                                              |
 |**Description:**              |Grab SK-NIC Whois database. |
 |**Status:**                   |Supported in Plugins v2.X. Updated to use Plugin-DevEnv v2.X.       |
 |                              |                                                               |

@@ -1,4 +1,4 @@
-package eu.unifiedviews.plugins.transformer.skwhoistocsv;
+package eu.comsode.unifiedviews.plugins.extractor.skwhoistocsv;
 
 import java.io.BufferedReader;
 import java.io.File;
