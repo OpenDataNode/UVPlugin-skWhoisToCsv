@@ -1,3 +1,4 @@
+Contact-name;Organization;Legal-form;Organization ID;Work-telephone;Fax-telephone;Work-address;Email-address;Handle;User-delegation;User-delegation;User-delegation;Last-record-update
 Mgr. Stanislav Parnicky, Ing. Gabriel Lachmann;EEA, s.r.o.;s.r.o;17321204;02-44453691;02-44453854;Hattalova 12/B, Bratislava 83103;sp-hostmaster@eea.sk;EURO-0002;ISKI-0001;EURO-0002;PLAT-0008;2010-07-28
 Mgr. Stanislav Parnicky, Ing. Gabriel Lachmann;EEA, s.r.o.;s.r.o;17321204;02-44453691;02-44453854;Hattalova 12/B, Bratislava 83103;sp-hostmaster@eea.sk;EURO-0002;ISKI-0001;EURO-0002;PLAT-0008;2010-07-28
 Mgr. Stanislav Parnicky, Ing. Gabriel Lachmann;EEA, s.r.o.;s.r.o;17321204;02-44453691;02-44453854;Hattalova 12/B, Bratislava 83103;sp-hostmaster@eea.sk;EURO-0002;ISKI-0001;EURO-0002;PLAT-0008;2010-07-28

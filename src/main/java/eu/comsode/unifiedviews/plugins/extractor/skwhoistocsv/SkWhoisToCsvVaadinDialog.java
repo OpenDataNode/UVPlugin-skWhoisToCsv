@@ -1,7 +1,5 @@
 package eu.comsode.unifiedviews.plugins.extractor.skwhoistocsv;
 
-import com.vaadin.ui.VerticalLayout;
-
 import eu.unifiedviews.dpu.config.DPUConfigException;
 import eu.unifiedviews.helpers.dpu.vaadin.dialog.AbstractDialog;
 
@@ -18,8 +16,6 @@ public class SkWhoisToCsvVaadinDialog extends AbstractDialog<SkWhoisToCsvConfig_
 
     @Override
     protected void buildDialogLayout() {
-//        VerticalLayout layout = new VerticalLayout();
-//        setCompositionRoot(layout);
     }
 
     @Override

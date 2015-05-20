@@ -38,7 +38,7 @@ import eu.unifiedviews.helpers.dpu.exec.AbstractDpu;
 
 @DPU.AsTransformer
 public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
-    public static Pattern PATTERN = Pattern.compile("(.*)   *(.*)");
+    public static Pattern PATTERN = Pattern.compile("(.*?)   *(.*)");
     private static final Logger LOG = LoggerFactory.getLogger(SkWhoisToCsv.class);
 
     @DataUnit.AsInput(name = "filesInput")
@@ -63,7 +63,14 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
             try (BufferedReader inputReader = new BufferedReader(new FileReader(inputFile));
                     PrintWriter outputWriter = new PrintWriter(new FileWriter(outputFile))) {
                 String line = null;
+                boolean firstLineInput = true;
+                boolean firstLineOutput = true;
+                List<String> outputHeader = new ArrayList<String>();
                 while ((line = inputReader.readLine()) != null) {
+                    if (firstLineInput) {
+                        firstLineInput = false;
+                        continue;
+                    }
                     List<String> outputLine = new ArrayList<>();
                     try (Socket whoisClientSocket = new Socket()) {
                         line = line + "\r\n";
@@ -72,17 +79,30 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
                         whoisClientSocket.getOutputStream().write(buffer);
                         whoisClientSocket.getOutputStream().flush();
                         List<String> whoisLines = IOUtils.readLines(whoisClientSocket.getInputStream(), "US-ASCII");
+                        int i = 0;
                         for (String whoisLine : whoisLines) {
                             if (StringUtils.isBlank(whoisLine) || whoisLine.startsWith("%")) {
                                 continue;
                             }
                             Matcher m = PATTERN.matcher(whoisLine);
                             if (m.matches()) {
+                                if (firstLineOutput) {
+                                    outputHeader.add(m.group(1));
+                                } else {
+                                    if (!outputHeader.get(i).equals(m.group(1))) {
+                                        LOG.error("Unknown column key " + m.group(1) + " with value " + m.group(2) + " found on record of " + line);
+                                    }
+                                }
                                 outputLine.add(m.group(2));
                             } else {
                                 throw ContextUtils.dpuException(ctx, "FilesFilter.innerExecute.format", whoisLine);
                             }
+                            i++;
                         }
+                    }
+                    if (firstLineOutput) {
+                        outputWriter.println(StringUtils.join(outputHeader, ";"));
+                        firstLineOutput = false;
                     }
                     outputWriter.println(StringUtils.join(outputLine, ";"));
                     LOG.info("Done file {}", index);
