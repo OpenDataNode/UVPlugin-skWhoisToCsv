@@ -36,7 +36,7 @@ import eu.unifiedviews.helpers.dpu.config.ConfigHistory;
 import eu.unifiedviews.helpers.dpu.context.ContextUtils;
 import eu.unifiedviews.helpers.dpu.exec.AbstractDpu;
 
-@DPU.AsTransformer
+@DPU.AsExtractor
 public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
     public static Pattern PATTERN = Pattern.compile("(.*?)   *(.*)");
     private static final Logger LOG = LoggerFactory.getLogger(SkWhoisToCsv.class);
