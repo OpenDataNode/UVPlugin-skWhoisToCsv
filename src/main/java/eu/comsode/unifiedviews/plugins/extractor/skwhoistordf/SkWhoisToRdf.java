@@ -157,7 +157,7 @@ public class SkWhoisToRdf extends AbstractDpu<SkWhoisToRdfConfig_V1> {
                             }
                         }
                         index++;
-                    } catch (RepositoryException ex) {
+                    } catch (RepositoryException | IOException ex) {
                         LOG.error("Error general for line " + line, ex);
                     }
                 }
