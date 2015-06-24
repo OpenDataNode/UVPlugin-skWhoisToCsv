@@ -1,4 +1,4 @@
-package eu.comsode.unifiedviews.plugins.extractor.skwhoistocsv;
+package eu.comsode.unifiedviews.plugins.extractor.skwhoistordf;
 
 import java.io.File;
 import java.io.InputStream;
@@ -15,19 +15,21 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 
 import cz.cuni.mff.xrg.odcs.dpu.test.TestEnvironment;
+import eu.comsode.unifiedviews.plugins.extractor.skwhoistordf.SkWhoisToRdf;
+import eu.comsode.unifiedviews.plugins.extractor.skwhoistordf.SkWhoisToRdfConfig_V1;
 import eu.unifiedviews.dataunit.files.WritableFilesDataUnit;
 import eu.unifiedviews.dataunit.rdf.WritableRDFDataUnit;
 import eu.unifiedviews.helpers.dataunit.rdf.RDFHelper;
 import eu.unifiedviews.helpers.dpu.test.config.ConfigurationBuilder;
 
-public class SkWhoisToCsvTest {
+public class SkWhoisToRdfTest {
 
     @Test
     public void execute() throws Exception {
         // Prepare config.
-        SkWhoisToCsvConfig_V1 config = new SkWhoisToCsvConfig_V1();
+        SkWhoisToRdfConfig_V1 config = new SkWhoisToRdfConfig_V1();
 
-        SkWhoisToCsv dpu = new SkWhoisToCsv();
+        SkWhoisToRdf dpu = new SkWhoisToRdf();
         // Prepare DPU.
         dpu.configure((new ConfigurationBuilder()).setDpuConfiguration(config).toString());
 
@@ -70,9 +72,9 @@ public class SkWhoisToCsvTest {
     @Test
     public void execute2() throws Exception {
         // Prepare config.
-        SkWhoisToCsvConfig_V1 config = new SkWhoisToCsvConfig_V1();
+        SkWhoisToRdfConfig_V1 config = new SkWhoisToRdfConfig_V1();
 
-        SkWhoisToCsv dpu = new SkWhoisToCsv();
+        SkWhoisToRdf dpu = new SkWhoisToRdf();
         // Prepare DPU.
         dpu.configure((new ConfigurationBuilder()).setDpuConfiguration(config).toString());
 

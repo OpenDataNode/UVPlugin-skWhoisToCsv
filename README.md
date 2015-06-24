@@ -1,17 +1,17 @@
-# E-SkWhoisToCsv #
+# E-SkWhoisToRdf #
 ----------
 
 ###General###
 
 |                              |                                                               |
 |------------------------------|---------------------------------------------------------------|
-|**Name:**                     |E-SkWhoisToCsv                                              |
+|**Name:**                     |E-SkWhoisToRdf                                              |
 |**Description:**              |Grab SK-NIC Whois database. |
 |**Status:**                   |Supported in Plugins v2.X. Updated to use Plugin-DevEnv v2.X.       |
 |                              |                                                               |
-|**DPU class name:**           |SkWhoisToCsv     | 
-|**Configuration class name:** |SkWhoisToCsvConfig_V1                           |
-|**Dialogue class name:**      |SkWhoisToCsvVaadinDialog | 
+|**DPU class name:**           |SkWhoisToRdf     | 
+|**Configuration class name:** |SkWhoisToRdfConfig_V1                           |
+|**Dialogue class name:**      |SkWhoisToRdfVaadinDialog | 
 
 ***
 
@@ -28,7 +28,7 @@
 |Name                |Type       |DataUnit                         |Description                        |
 |--------------------|-----------|---------------------------------|-----------------------------------|
 |input |i |FilesDataUnit  |One file containing list of entity IDs |
-|output|o |FilesDataUnit |One CSV containing details for each entity ID on one row. | 
+|output|o |RDFDataUnit |Entity containing key-value pairs in http://localhost namespace | 
 
 ***
 

@@ -1,4 +1,4 @@
-package eu.comsode.unifiedviews.plugins.extractor.skwhoistocsv;
+package eu.comsode.unifiedviews.plugins.extractor.skwhoistordf;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,10 +38,10 @@ import eu.unifiedviews.helpers.dpu.exec.AbstractDpu;
 import eu.unifiedviews.helpers.dpu.rdf.EntityBuilder;
 
 @DPU.AsExtractor
-public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
+public class SkWhoisToRdf extends AbstractDpu<SkWhoisToRdfConfig_V1> {
     public static Pattern PATTERN = Pattern.compile("(.*?)   *(.*)");
 
-    private static final Logger LOG = LoggerFactory.getLogger(SkWhoisToCsv.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SkWhoisToRdf.class);
 
     private static final String BASE_URI = "http://localhost/";
 
@@ -57,8 +57,8 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
     @DataUnit.AsOutput(name = "rdfOutput")
     public WritableRDFDataUnit rdfOutput;
 
-    public SkWhoisToCsv() {
-        super(SkWhoisToCsvVaadinDialog.class, ConfigHistory.noHistory(SkWhoisToCsvConfig_V1.class));
+    public SkWhoisToRdf() {
+        super(SkWhoisToRdfVaadinDialog.class, ConfigHistory.noHistory(SkWhoisToRdfConfig_V1.class));
     }
 
     @Override
@@ -127,7 +127,7 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
                             }
                             if (whoisLines.size() != 0) {
                                 LOG.info("Reading data for ID: " + inputId + " index: " + index);
-                                WAIT_IN_MILIS = Math.max(WAIT_IN_MILIS / 4, 1);
+                                WAIT_IN_MILIS = Math.max(WAIT_IN_MILIS/4, 1);
                                 connection.add(eb.asStatements(), graph);
                                 break;
                             } else if (whoisLines.size() == 0 && failCount == REPEAT_COUNT) {
