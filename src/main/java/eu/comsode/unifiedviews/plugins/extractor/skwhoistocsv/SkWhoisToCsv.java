@@ -126,8 +126,9 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
                                 }
                             }
                             if (whoisLines.size() != 0) {
-                                LOG.info("Reading data for ID " + inputId + ".");
+                                LOG.info("Reading data for ID: " + inputId + " index: " + index);
                                 WAIT_IN_MILIS = Math.max(WAIT_IN_MILIS / 4, 1);
+                                connection.add(eb.asStatements(), graph);
                                 break;
                             } else if (whoisLines.size() == 0 && failCount == REPEAT_COUNT) {
                                 WAIT_IN_MILIS *= 2;
@@ -140,8 +141,6 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
                             }
                         }
                     }
-                    connection.add(eb.asStatements(), graph);
-                    LOG.info("Done file {}", index);
                     index++;
                 }
             } catch (IOException ex) {
