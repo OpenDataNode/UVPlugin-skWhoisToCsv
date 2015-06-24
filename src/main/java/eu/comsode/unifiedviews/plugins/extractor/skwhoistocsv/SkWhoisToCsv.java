@@ -45,9 +45,9 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
 
     private static final String BASE_URI = "http://localhost/";
 
-    private static final int REPEAT_COUNT = 3;
+    private static final int REPEAT_COUNT = 30;
 
-    private static final int WAIT_IN_MILIS = 1000;
+    private static int WAIT_IN_MILIS = 100;
 
     private Map<String, Integer> keys = new HashMap<String, Integer>();
 
@@ -89,6 +89,14 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
                     eb.property(RDF.TYPE, vf.createURI(BASE_URI + "Record"));
                     int failCount = 1;
                     while (true) {
+                        try {
+                            Thread.sleep(WAIT_IN_MILIS);
+                        } catch (InterruptedException ex) {
+                            LOG.error("Sleep for " + WAIT_IN_MILIS + " milliseconds interrupted.");
+                            Thread.currentThread().interrupt();
+                            throw ContextUtils.dpuExceptionCancelled(ctx);
+                        }
+
                         try (Socket whoisClientSocket = new Socket()) {
                             line = line + "\r\n";
                             byte[] buffer = line.getBytes("US-ASCII");
@@ -96,7 +104,6 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
                             whoisClientSocket.getOutputStream().write(buffer);
                             whoisClientSocket.getOutputStream().flush();
                             List<String> whoisLines = IOUtils.readLines(whoisClientSocket.getInputStream(), "US-ASCII");
-                            int i = 0;
                             for (String whoisLine : whoisLines) {
                                 if (StringUtils.isBlank(whoisLine) || whoisLine.startsWith("%")) {
                                     continue;
@@ -117,24 +124,19 @@ public class SkWhoisToCsv extends AbstractDpu<SkWhoisToCsvConfig_V1> {
                                 } else {
                                     throw ContextUtils.dpuException(ctx, "FilesFilter.innerExecute.format", whoisLine);
                                 }
-                                i++;
                             }
                             if (whoisLines.size() != 0) {
                                 LOG.info("Reading data for ID " + inputId + ".");
-                                failCount = 1;
+                                WAIT_IN_MILIS = Math.max(WAIT_IN_MILIS / 4, 1);
                                 break;
                             } else if (whoisLines.size() == 0 && failCount == REPEAT_COUNT) {
+                                WAIT_IN_MILIS *= 2;
                                 LOG.error("Error reading data for ID " + inputId + "!");
-                                failCount = 1;
                                 break;
                             } else {
-                                try {
-                                    LOG.warn("Error reading data for ID " + inputId + ". Trying to wait for " + WAIT_IN_MILIS * failCount + " milliseconds.");
-                                    Thread.sleep(WAIT_IN_MILIS * failCount);
-                                    failCount++;
-                                } catch (InterruptedException ex) {
-                                    LOG.error("Sleep for " + WAIT_IN_MILIS * failCount + " milliseconds interrupted.");
-                                }
+                                WAIT_IN_MILIS *= 2;
+                                LOG.warn("Error reading data for ID " + inputId + ". Trying to wait for " + WAIT_IN_MILIS + " milliseconds.");
+                                failCount++;
                             }
                         }
                     }
