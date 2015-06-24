@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,80 +73,94 @@ public class SkWhoisToRdf extends AbstractDpu<SkWhoisToRdfConfig_V1> {
             File inputFile = new File(URI.create(entry.getFileURIString()));
             int index = 1;
             RepositoryConnection connection = null;
-            try (BufferedReader inputReader = new BufferedReader(new FileReader(inputFile))) {
+            List<String> lines = Files.readAllLines(inputFile.toPath(), Charset.forName("US-ASCII"));
+            try {
                 org.openrdf.model.URI graph = rdfOutput.addNewDataGraph("skWhoisRdfData");
                 connection = rdfOutput.getConnection();
                 ValueFactory vf = ValueFactoryImpl.getInstance();
-                String line = null;
                 boolean firstLineInput = true;
-                while ((line = inputReader.readLine()) != null) {
-                    if (firstLineInput) {
-                        firstLineInput = false;
-                        continue;
-                    }
-                    String inputId = new String(line);
-                    UUID uuid = UUID.randomUUID();
-                    org.openrdf.model.URI uri = vf.createURI(BASE_URI + uuid.toString());
-                    EntityBuilder eb = new EntityBuilder(uri, vf);
-                    eb.property(RDF.TYPE, vf.createURI(BASE_URI + "Record"));
-                    int failCount = 1;
-                    while (true) {
-                        try {
-                            Thread.sleep(WAIT_IN_MILIS);
-                        } catch (InterruptedException ex) {
-                            LOG.error("Sleep for " + WAIT_IN_MILIS + " milliseconds interrupted.");
-                            Thread.currentThread().interrupt();
-                            throw ContextUtils.dpuExceptionCancelled(ctx);
+                for (String line : lines) {
+                    try {
+                        if (firstLineInput) {
+                            firstLineInput = false;
+                            continue;
                         }
-
-                        try (Socket whoisClientSocket = new Socket()) {
-                            line = line + "\r\n";
-                            byte[] buffer = line.getBytes("US-ASCII");
-                            whoisClientSocket.connect(new InetSocketAddress("whois.sk-nic.sk", 43));
-                            whoisClientSocket.getOutputStream().write(buffer);
-                            whoisClientSocket.getOutputStream().flush();
-                            List<String> whoisLines = IOUtils.readLines(whoisClientSocket.getInputStream(), "US-ASCII");
-                            for (String whoisLine : whoisLines) {
-                                if (StringUtils.isBlank(whoisLine) || whoisLine.startsWith("%")) {
-                                    continue;
-                                }
-                                if (StringUtils.contains(whoisLine, "Not found.")) {
-                                    LOG.error("ID " + inputId + " was not found!");
-                                    break;
-                                }
-                                Matcher m = PATTERN.matcher(whoisLine);
-                                if (m.matches()) {
-                                    String key = m.group(1).replaceAll(" ", "-");
-                                    if (!keys.containsKey(key)) {
-                                        LOG.error("Unknown key " + key + " with value " + m.group(2) + " found on record of " + line);
-                                    } else {
-                                        keys.put(key, keys.get(key) + 1);
+                        String inputId = new String(line);
+                        UUID uuid = UUID.randomUUID();
+                        org.openrdf.model.URI uri = vf.createURI(BASE_URI + uuid.toString());
+                        EntityBuilder eb = new EntityBuilder(uri, vf);
+                        eb.property(RDF.TYPE, vf.createURI(BASE_URI + "Record"));
+                        int failCount = 1;
+                        while (true) {
+                            try {
+                                Thread.sleep(WAIT_IN_MILIS);
+                            } catch (InterruptedException ex) {
+                                LOG.error("Sleep for " + WAIT_IN_MILIS + " milliseconds interrupted.");
+                                Thread.currentThread().interrupt();
+                                throw ContextUtils.dpuExceptionCancelled(ctx);
+                            }
+                            Socket whoisClientSocket = null;
+                            try  {
+                                whoisClientSocket =new Socket();
+                                line = line + "\r\n";
+                                byte[] buffer = line.getBytes("US-ASCII");
+                                whoisClientSocket.connect(new InetSocketAddress("whois.sk-nic.sk", 43));
+                                whoisClientSocket.getOutputStream().write(buffer);
+                                whoisClientSocket.getOutputStream().flush();
+                                List<String> whoisLines = IOUtils.readLines(whoisClientSocket.getInputStream(), "US-ASCII");
+                                boolean success = whoisLines.size() != 0;
+                                for (String whoisLine : whoisLines) {
+                                    if (StringUtils.isBlank(whoisLine) || whoisLine.startsWith("%")) {
+                                        continue;
                                     }
-                                    eb.property(vf.createURI(BASE_URI + key), m.group(2));
+                                    if (StringUtils.contains(whoisLine, "Not found.")) {
+                                        LOG.error("ID " + inputId + " was not found!");
+                                        break;
+                                    }
+                                    if (StringUtils.contains(whoisLine, "Read Timeout")) {
+                                        success = false;
+                                        break;
+                                    }
+                                    Matcher m = PATTERN.matcher(whoisLine);
+                                    if (m.matches()) {
+                                        String key = m.group(1).replaceAll(" ", "-");
+                                        if (!keys.containsKey(key)) {
+                                            LOG.error("Unknown key " + key + " with value " + m.group(2) + " found on record of " + line);
+                                        } else {
+                                            keys.put(key, keys.get(key) + 1);
+                                        }
+                                        eb.property(vf.createURI(BASE_URI + key), m.group(2));
+                                    } else {
+                                        LOG.error("Unknown reply format found on record of " + line + " reply : " + whoisLine);
+                                    }
+                                }
+                                if (success) {
+                                    LOG.info("Reading data for ID: " + inputId + " index: " + index);
+                                    WAIT_IN_MILIS = Math.max(WAIT_IN_MILIS / 4, 1);
+                                    connection.begin();
+                                    connection.add(eb.asStatements(), graph);
+                                    connection.commit();
+                                    break;
+                                } else if (!success && failCount == REPEAT_COUNT) {
+                                    WAIT_IN_MILIS *= 2;
+                                    LOG.error("Error reading data for ID " + inputId + "!");
+                                    break;
                                 } else {
-                                    throw ContextUtils.dpuException(ctx, "FilesFilter.innerExecute.format", whoisLine);
+                                    WAIT_IN_MILIS *= 2;
+                                    LOG.warn("Error reading data for ID " + inputId + ". Trying to wait for " + WAIT_IN_MILIS + " milliseconds.");
+                                    failCount++;
+                                }
+                            } finally {
+                                if (whoisClientSocket!= null) {
+                                    whoisClientSocket.close();
                                 }
                             }
-                            if (whoisLines.size() != 0) {
-                                LOG.info("Reading data for ID: " + inputId + " index: " + index);
-                                WAIT_IN_MILIS = Math.max(WAIT_IN_MILIS/4, 1);
-                                connection.add(eb.asStatements(), graph);
-                                break;
-                            } else if (whoisLines.size() == 0 && failCount == REPEAT_COUNT) {
-                                WAIT_IN_MILIS *= 2;
-                                LOG.error("Error reading data for ID " + inputId + "!");
-                                break;
-                            } else {
-                                WAIT_IN_MILIS *= 2;
-                                LOG.warn("Error reading data for ID " + inputId + ". Trying to wait for " + WAIT_IN_MILIS + " milliseconds.");
-                                failCount++;
-                            }
                         }
+                        index++;
+                    } catch (RepositoryException ex) {
+                        LOG.error("Error general for line " + line, ex);
                     }
-                    index++;
                 }
-            } catch (IOException ex) {
-                ContextUtils.dpuException(ctx, ex, "FilesFilter.innerExecute.exception");
             } finally {
                 if (connection != null) {
                     try {
@@ -157,8 +173,8 @@ public class SkWhoisToRdf extends AbstractDpu<SkWhoisToRdfConfig_V1> {
             for (Map.Entry<String, Integer> e : keys.entrySet()) {
                 LOG.info("Parameter " + e.getKey() + " was filled " + e.getValue() + " times.");
             }
-        } catch (DataUnitException | RepositoryException ex) {
-            ContextUtils.dpuException(ctx, ex, "FilesFilter.innerExecute.exception");
+        } catch (IOException | DataUnitException ex) {
+            throw ContextUtils.dpuException(ctx, ex, "FilesFilter.innerExecute.exception");
         }
     }
 

@@ -5,18 +5,15 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 
 import cz.cuni.mff.xrg.odcs.dpu.test.TestEnvironment;
-import eu.comsode.unifiedviews.plugins.extractor.skwhoistordf.SkWhoisToRdf;
-import eu.comsode.unifiedviews.plugins.extractor.skwhoistordf.SkWhoisToRdfConfig_V1;
 import eu.unifiedviews.dataunit.files.WritableFilesDataUnit;
 import eu.unifiedviews.dataunit.rdf.WritableRDFDataUnit;
 import eu.unifiedviews.helpers.dataunit.rdf.RDFHelper;
