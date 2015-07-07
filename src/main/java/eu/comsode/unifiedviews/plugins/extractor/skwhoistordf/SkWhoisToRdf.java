@@ -118,9 +118,8 @@ public class SkWhoisToRdf extends AbstractDpu<SkWhoisToRdfConfig_V1> {
                                 continue;
                             }
                             if (StringUtils.contains(whoisLine, "Not found.")) {
-                                LOG.error("ID " + inputId + " was not found!");
                                 repeat = false;
-                                break;
+                                throw new Exception("ID " + inputId + " was not found!");
                             }
                             if (StringUtils.contains(whoisLine, "Read Timeout")) {
                                 throw new Exception("Read Timeout, we are too slow");
@@ -135,9 +134,8 @@ public class SkWhoisToRdf extends AbstractDpu<SkWhoisToRdfConfig_V1> {
                                 }
                                 eb.property(vf.createURI(BASE_URI + key), m.group(2));
                             } else {
-                                LOG.error("Unknown reply format found on record of " + line + " reply : " + whoisLine);
                                 repeat = false;
-                                break;
+                                throw new Exception("Unknown reply format found on record of " + line + " reply : " + whoisLine);
                             }
                         }
 
@@ -148,14 +146,14 @@ public class SkWhoisToRdf extends AbstractDpu<SkWhoisToRdfConfig_V1> {
                         connection.commit();
                         repeat = false;
                     } catch (Exception ex) {
-                        if (failCount == REPEAT_COUNT) {
+                        if ((failCount < REPEAT_COUNT)&&repeat) {
                             WAIT_IN_MILIS *= 2;
-                            LOG.error("Error reading data for ID " + inputId + "!");
-                            repeat = false;
+                            LOG.warn("Error reading data for ID " + inputId + ". Trying to wait for " + WAIT_IN_MILIS + " milliseconds.", ex);
+                            failCount++;
                         } else {
                             WAIT_IN_MILIS *= 2;
-                            LOG.warn("Error reading data for ID " + inputId + ". Trying to wait for " + WAIT_IN_MILIS + " milliseconds.");
-                            failCount++;
+                            LOG.error("Error reading data for ID " + inputId + "!", ex);
+                            repeat = false;
                         }
                     } finally {
                         if (whoisClientSocket != null) {
