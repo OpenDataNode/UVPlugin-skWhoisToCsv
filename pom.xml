@@ -13,7 +13,7 @@
 	<artifactId>uv-e-skWhoisToRdf</artifactId>
 	<description>Grab SK-NIC Whois database.</description>
 	<packaging>bundle</packaging>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>E-SkWhoisToRdf</name>
 
 	<properties>
