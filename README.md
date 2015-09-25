@@ -8,4 +8,4 @@ E-SkWhoisToRdf
 
 ### Version history ###
 
-* see[Changelog](./CHANGELOG.md)
+* see [Changelog](./CHANGELOG.md)
