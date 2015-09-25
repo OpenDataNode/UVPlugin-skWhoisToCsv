@@ -1,0 +1,35 @@
+# Local configurations
+frontend/src/main/webapp/WEB-INF/config.properties
+*.local.xml
+
+*.class
+
+# Log files #
+*.log
+
+# Eclipse Project Files #
+.project
+.settings/
+.classpath
+.pmd
+
+# Netbeans files #
+nbactions.xml
+nb-configuration.xml
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+
+# Frontend generated sources
+frontend/src/main/webapp/VAADIN/
+
+# Build Directories #
+target/
+bin/
+
+# Package Files #
+*.war
+*.jar
+*.ear
+*.orig

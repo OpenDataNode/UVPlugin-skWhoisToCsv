@@ -1,0 +1,13 @@
+
+<http://localhost/eca6f415-5d0c-4460-bba0-4dd88a40cdaf> a <http://localhost/Record> ;
+	<http://localhost/Contact-name> "Mgr. Stanislav Parnicky, Ing. Gabriel Lachmann" ;
+	<http://localhost/Organization> "EEA, s.r.o." ;
+	<http://localhost/Legal-form> "s.r.o" ;
+	<http://localhost/Organization-ID> "17321204" ;
+	<http://localhost/Work-telephone> "02-44453691" ;
+	<http://localhost/Fax-telephone> "02-44453854" ;
+	<http://localhost/Work-address> "Hattalova 12/B, Bratislava 83103" ;
+	<http://localhost/Email-address> "sp-hostmaster@eea.sk" ;
+	<http://localhost/Handle> "EURO-0002" ;
+	<http://localhost/User-delegation> "EURO-0002" , "ISKI-0001" , "PLAT-0008" ;
+	<http://localhost/Last-record-update> "2010-07-28" .
